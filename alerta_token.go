@@ -11,22 +11,22 @@ import (
 )
 
 const (
-	alertaTokenType = "alerta_token"
+	alertaKeyType = "alerta_api_key"
 )
 
-// alertaToken defines a secret for the Alerta token
-type alertaToken struct {
+// alertaKey defines a secret for the Alerta API Key
+type alertaKey struct {
 	ID         string    `json:"alerta_api_key_id"`
 	Key        string    `json:"alerta_api_key"`
 	ExpireTime time.Time `json:"expire_time"`
 	RoleName   string    `json:"role_name"`
 }
 
-// alertaToken defines a secret to store for a given role
+// alertaKey defines a secret to store for a given role
 // and how it should be revoked or renewed.
-func (b *alertaBackend) alertaToken() *framework.Secret {
+func (b *alertaBackend) alertaKey() *framework.Secret {
 	return &framework.Secret{
-		Type: alertaTokenType,
+		Type: alertaKeyType,
 		Fields: map[string]*framework.FieldSchema{
 			"alerta_api_key": {
 				Type:        framework.TypeString,
@@ -41,13 +41,13 @@ func (b *alertaBackend) alertaToken() *framework.Secret {
 				Description: "Time the API key expires",
 			},
 		},
-		Revoke: b.tokenRevoke,
-		Renew:  b.tokenRenew,
+		Revoke: b.keyRevoke,
+		Renew:  b.keyRenew,
 	}
 }
 
-// tokenRevoke removes the token from the Vault storage API and calls the client to revoke the token
-func (b *alertaBackend) tokenRevoke(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
+// keyRevoke removes the key from the Vault storage API and calls the client to revoke the key
+func (b *alertaBackend) keyRevoke(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	client, err := b.getClient(ctx, req.Storage)
 	if err != nil {
 		return nil, fmt.Errorf("error getting client: %w", err)
@@ -62,14 +62,14 @@ func (b *alertaBackend) tokenRevoke(ctx context.Context, req *logical.Request, d
 		}
 	}
 
-	if err := b.deleteToken(ctx, client, apiKeyId); err != nil {
+	if err := b.deleteKey(ctx, client, apiKeyId); err != nil {
 		return nil, fmt.Errorf("error revoking Alerta API Key: %w", err)
 	}
 	return nil, nil
 }
 
-// tokenRenew calls the client to create a new token and stores it in the Vault storage API
-func (b *alertaBackend) tokenRenew(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
+// keyRenew calls the client to create a new key and stores it in the Vault storage API
+func (b *alertaBackend) keyRenew(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	roleRaw, ok := req.Secret.InternalData["role_name"]
 	if !ok {
 		return nil, fmt.Errorf("secret is missing role_name internal data")
@@ -97,7 +97,7 @@ func (b *alertaBackend) tokenRenew(ctx context.Context, req *logical.Request, d 
 	return resp, nil
 }
 
-func (b *alertaBackend) deleteToken(ctx context.Context, c *alertaClient, id string) error {
+func (b *alertaBackend) deleteKey(ctx context.Context, c *alertaClient, id string) error {
 	_, err := c.deleteKey(ctx, id)
 	if err != nil {
 		return fmt.Errorf("error deleting Alerta API key: %w", err)
@@ -106,12 +106,12 @@ func (b *alertaBackend) deleteToken(ctx context.Context, c *alertaClient, id str
 	return nil
 }
 
-func (b *alertaBackend) createToken(ctx context.Context, c *alertaClient, r *alertaRoleEntry) (*alertaToken, error) {
+func (b *alertaBackend) createKey(ctx context.Context, c *alertaClient, r *alertaRoleEntry) (*alertaKey, error) {
 
 	response, err := c.createKey(ctx, r.User, r.Scopes, fmt.Sprintf("%s at %s", r.Description, time.Now().Format(time.RFC3339)), time.Now().Add(r.MaxTTL).UTC().Format(time.RFC3339Nano))
 
 	if err != nil {
-		return nil, fmt.Errorf("error creating Alerta token: %w", err)
+		return nil, fmt.Errorf("error creating Alerta API Key: %w", err)
 	}
 
 	layout := time.RFC3339
@@ -121,7 +121,7 @@ func (b *alertaBackend) createToken(ctx context.Context, c *alertaClient, r *ale
 		return nil, fmt.Errorf("***REMOVED***error parsing expire time: %w", err)
 	}
 
-	return &alertaToken{
+	return &alertaKey{
 		ID:         response.ID,
 		Key:        response.Key,
 		ExpireTime: expireTime,

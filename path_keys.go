@@ -32,7 +32,7 @@ func pathKeys(b *alertaBackend) *framework.Path {
 	}
 }
 
-// pathKeysRead creates a new Alerta token each time it is called if a
+// pathKeysRead creates a new Alerta API Key each time it is called if a
 // role exists.
 func (b *alertaBackend) pathKeysRead(ctx context.Context, req *logical.Request, d *framework.FieldData) (*logical.Response, error) {
 	roleName := d.Get("name").(string)
@@ -51,7 +51,7 @@ func (b *alertaBackend) pathKeysRead(ctx context.Context, req *logical.Request, 
 	return b.createUserCreds(ctx, req, roleEntry)
 }
 
-// createUserCreds creates a new Alerta token to store into the Vault backend, generates
+// createUserCreds creates a new Alerta API Key to store into the Vault backend, generates
 // a response with the secrets information, and checks the TTL and MaxTTL attributes.
 func (b *alertaBackend) createUserCreds(ctx context.Context, req *logical.Request, role *alertaRoleEntry) (*logical.Response, error) {
 	client, err := b.getClient(ctx, req.Storage)
@@ -59,7 +59,7 @@ func (b *alertaBackend) createUserCreds(ctx context.Context, req *logical.Reques
 		return nil, err
 	}
 
-	token, err := b.createToken(ctx, client, role)
+	key, err := b.createKey(ctx, client, role)
 	if err != nil {
 		return nil, err
 	}
@@ -67,14 +67,14 @@ func (b *alertaBackend) createUserCreds(ctx context.Context, req *logical.Reques
 	// The response is divided into two objects (1) internal data and (2) data.
 	// If you want to reference any information in your code, you need to
 	// store it in internal data!
-	resp := b.Secret(alertaTokenType).Response(map[string]interface{}{
-		"alerta_api_key":    token.Key,
-		"alerta_api_key_id": token.ID,
-		"expire_time":       token.ExpireTime,
+	resp := b.Secret(alertaKeyType).Response(map[string]interface{}{
+		"alerta_api_key":    key.Key,
+		"alerta_api_key_id": key.ID,
+		"expire_time":       key.ExpireTime,
 		"role_name":         role.Name,
 	}, map[string]interface{}{
-		"alerta_api_key":    token.Key,
-		"alerta_api_key_id": token.ID,
+		"alerta_api_key":    key.Key,
+		"alerta_api_key_id": key.ID,
 		"role_name":         role.Name,
 	})
 
@@ -90,10 +90,10 @@ func (b *alertaBackend) createUserCreds(ctx context.Context, req *logical.Reques
 }
 
 const pathKeysHelpSyn = `
-Generate a Alerta API token from a specific Vault role.
+Generate a Alerta API key from a specific Vault role.
 `
 
 const pathKeysHelpDesc = `
-This path generates an Alerta API user token
+This path generates an Alerta API key
 based on a particular role.
 `

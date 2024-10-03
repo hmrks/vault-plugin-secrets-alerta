@@ -17,7 +17,7 @@ const (
 // required to instantiate a new Alerta client.
 type alertaConfig struct {
 	ApiURL    string `json:"api_url"`
-	AuthToken string `json:"auth_token"`
+	AuthKey string `json:"auth_key"`
 }
 
 func getConfig(ctx context.Context, s logical.Storage) (*alertaConfig, error) {
@@ -49,12 +49,12 @@ func pathConfig(b *alertaBackend) *framework.Path {
 	return &framework.Path{
 		Pattern: "config",
 		Fields: map[string]*framework.FieldSchema{
-			"auth_token": {
+			"auth_key": {
 				Type:        framework.TypeString,
-				Description: "The authentication token for the Alerta API",
+				Description: "The authentication key for the Alerta API",
 				Required:    true,
 				DisplayAttrs: &framework.DisplayAttributes{
-					Name:      "Auth Token",
+					Name:      "Auth Key",
 					Sensitive: true,
 				},
 			},
@@ -134,10 +134,10 @@ func (b *alertaBackend) pathConfigWrite(ctx context.Context, req *logical.Reques
 		return nil, errors.New("api_url is required")
 	}
 
-	if auth_token, ok := data.GetOk("auth_token"); ok {
-		config.AuthToken = auth_token.(string)
+	if auth_key, ok := data.GetOk("auth_key"); ok {
+		config.AuthKey = auth_key.(string)
 	} else if !ok && createOperation {
-		return nil, errors.New("auth_token is required")
+		return nil, errors.New("auth_key is required")
 	}
 
 	entry, err := logical.StorageEntryJSON(configStoragePath, config)
@@ -172,8 +172,8 @@ const pathConfigHelpSynopsis = `Configure the Alerta backend`
 // pathConfigHelpDescription describes the help text for the configuration
 const pathConfigHelpDescription = `
 The Alerta secret backend requires credentials for managing
-API tokens issued to applications working with the Alerta API.
+API keys issued to applications working with Alerta.
 
-You must provide the Api URL for the Alerta API and an
-authentication token to authorize requests.
+You must provide the URL for the Alerta API and an
+authentication key to authorize requests.
 `

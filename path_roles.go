@@ -11,7 +11,7 @@ import (
 
 // alertaRoleEntry defines the data required
 // for a Vault role to access and call the Alerta
-// token endpoints
+// key endpoints
 type alertaRoleEntry struct {
 	User        string        `json:"user"`
 	Scopes      []string      `json:"scopes"`
@@ -106,10 +106,10 @@ func pathRole(b *alertaBackend) []*framework.Path {
 }
 
 const (
-	pathRoleHelpSynopsis    = `Manages the Vault role for generating Alerta tokens.`
+	pathRoleHelpSynopsis    = `Manages the Vault role for generating Alerta API Keys.`
 	pathRoleHelpDescription = `
-This path allows you to read and write roles used to generate Alerta tokens.
-You can configure a role to manage a user's token by setting the username field.
+This path allows you to read and write roles used to generate Alerta API Keys.
+You can configure a role to manage a user's key by setting the username field.
 `
 
 	pathRoleListHelpSynopsis    = `List the existing roles in Alerta backend`

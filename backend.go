@@ -50,7 +50,7 @@ func backend() *alertaBackend {
 			},
 		),
 		Secrets: []*framework.Secret{
-			b.alertaToken(),
+			b.alertaKey(),
 		},
 		BackendType: logical.TypeLogical,
 		Invalidate:  b.invalidate,
@@ -106,8 +106,8 @@ func (b *alertaBackend) getClient(ctx context.Context, s logical.Storage) (*aler
 
 // backendHelp should contain help information for the backend
 const backendHelp = `
-The Alerta secrets backend dynamically generates application tokens
-that can be used to send alerts to the Alerta API.
+The Alerta secrets backend dynamically generates API keys
+that can be used to send alerts to Alerta.
 `
 
 func (b *alertaBackend) pathRoleExistenceCheck(ctx context.Context, req *logical.Request, d *framework.FieldData) (bool, error) {

@@ -15,7 +15,7 @@ import (
 // the client.
 type alertaClient struct {
 	ApiURL     string
-	AuthToken  string
+	AuthKey  string
 	HTTPClient *http.Client
 }
 
@@ -30,13 +30,13 @@ func newClient(config *alertaConfig) (*alertaClient, error) {
 		return nil, errors.New("client API URL was not defined")
 	}
 
-	if config.AuthToken == "" {
-		return nil, errors.New("client auth token was not defined")
+	if config.AuthKey == "" {
+		return nil, errors.New("client auth key was not defined")
 	}
 
 	return &alertaClient{
 		ApiURL:    config.ApiURL,
-		AuthToken: config.AuthToken,
+		AuthKey: config.AuthKey,
 		HTTPClient: &http.Client{
 			Timeout: 10 * time.Second,
 		},
@@ -50,7 +50,7 @@ func (c *alertaClient) makeRequest(ctx context.Context, method, endpoint string,
 	}
 
 	// Set headers
-	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.AuthToken))
+	req.Header.Set("Authorization", fmt.Sprintf("Key %s", c.AuthKey))
 	req.Header.Set("Content-Type", "application/json")
 
 	return c.HTTPClient.Do(req)
