@@ -16,7 +16,7 @@ const (
 // alertaConfig includes the minimum configuration
 // required to instantiate a new Alerta client.
 type alertaConfig struct {
-	ApiURL    string `json:"api_url"`
+	ApiURL  string `json:"api_url"`
 	AuthKey string `json:"auth_key"`
 }
 

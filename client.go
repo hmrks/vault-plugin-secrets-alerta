@@ -15,7 +15,7 @@ import (
 // the client.
 type alertaClient struct {
 	ApiURL     string
-	AuthKey  string
+	AuthKey    string
 	HTTPClient *http.Client
 }
 
@@ -35,7 +35,7 @@ func newClient(config *alertaConfig) (*alertaClient, error) {
 	}
 
 	return &alertaClient{
-		ApiURL:    config.ApiURL,
+		ApiURL:  config.ApiURL,
 		AuthKey: config.AuthKey,
 		HTTPClient: &http.Client{
 			Timeout: 10 * time.Second,
@@ -79,7 +79,7 @@ func (c *alertaClient) createKey(ctx context.Context, user string, scopes []stri
 		return nil, err
 	}
 
-	resp, err := c.makeRequest(ctx, "POST", "/api/key", jsonBody)
+	resp, err := c.makeRequest(ctx, "POST", "/key", jsonBody)
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +124,7 @@ type DeleteKeyResponse struct {
 }
 
 func (c *alertaClient) deleteKey(ctx context.Context, id string) (*DeleteKeyResponse, error) {
-	resp, err := c.makeRequest(ctx, "DELETE", fmt.Sprintf("/api/key/%s", id), nil)
+	resp, err := c.makeRequest(ctx, "DELETE", fmt.Sprintf("/key/%s", id), nil)
 	if err != nil {
 		return nil, err
 	}
