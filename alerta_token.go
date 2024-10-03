@@ -118,7 +118,7 @@ func (b *alertaBackend) createKey(ctx context.Context, c *alertaClient, r *alert
 
 	expireTime, err := time.Parse(layout, response.ExpireTime)
 	if err != nil {
-		return nil, fmt.Errorf("***REMOVED***error parsing expire time: %w", err)
+		return nil, fmt.Errorf("error parsing expire time: %w", err)
 	}
 
 	return &alertaKey{
