@@ -87,7 +87,7 @@ func (c *alertaClient) createKey(ctx context.Context, user string, scopes []stri
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusCreated {
-		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
+		return nil, fmt.Errorf("unexpected status code: %d, %s", resp.StatusCode, jsonBody)
 	}
 
 	body, err := io.ReadAll(resp.Body)
