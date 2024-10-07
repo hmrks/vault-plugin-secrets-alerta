@@ -108,7 +108,7 @@ func (b *alertaBackend) deleteKey(ctx context.Context, c *alertaClient, id strin
 
 func (b *alertaBackend) createKey(ctx context.Context, c *alertaClient, r *alertaRoleEntry) (*alertaKey, error) {
 
-	response, err := c.createKey(ctx, r.User, r.Scopes, fmt.Sprintf("%s at %s", r.Description, time.Now().Format(time.RFC3339)), time.Now().Add(r.MaxTTL).UTC().Format(time.RFC3339Nano))
+	response, err := c.createKey(ctx, r.User, r.Scopes, fmt.Sprintf("%s at %s", r.Description, time.Now().Format(time.RFC3339)), time.Now().Add(r.MaxTTL).UTC().Format("2006-01-02T15:04:05.000Z"))
 
 	if err != nil {
 		return nil, fmt.Errorf("error creating Alerta API Key: %w", err)
