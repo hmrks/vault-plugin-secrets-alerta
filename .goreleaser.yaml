@@ -21,11 +21,8 @@ builds:
     main: './cmd/{{ .ProjectName }}'
 
 archives:
-  - format: tar.gz
-    name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}'
-    format_overrides:
-      - goos: windows
-        format: zip
+  - format: binary
+
 checksum:
   name_template: '{{ .ProjectName }}_{{ .Version }}_SHA256SUMS'
   algorithm: sha256
